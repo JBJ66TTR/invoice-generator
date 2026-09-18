@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>EasyInvoice - Invoice Generator</title>
+  <title>EasyInvoice</title>
 
   <style>
     * {
@@ -21,17 +21,17 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 950px;
       margin: auto;
       background: white;
-      padding: 35px;
+      padding: 30px;
       border-radius: 12px;
       box-shadow: 0 5px 25px rgba(0,0,0,0.08);
     }
 
     h1 {
-      margin-bottom: 25px;
       color: #2563eb;
+      margin-bottom: 25px;
     }
 
     h2 {
@@ -59,7 +59,8 @@
       margin-top: 15px;
     }
 
-    th, td {
+    th,
+    td {
       padding: 10px;
       border-bottom: 1px solid #ddd;
       text-align: left;
@@ -67,10 +68,6 @@
 
     th {
       background: #f1f5f9;
-    }
-
-    .item-input {
-      width: 100%;
     }
 
     button {
@@ -84,19 +81,24 @@
 
     .add-btn {
       background: #e2e8f0;
-      color: #222;
     }
 
-    .delete-btn {
-      background: #fee2e2;
-      color: #dc2626;
-      margin: 0;
+    .save-btn {
+      background: #16a34a;
+      color: white;
     }
 
     .print-btn {
       background: #2563eb;
       color: white;
       margin-left: 8px;
+    }
+
+    .delete-btn {
+      background: #fee2e2;
+      color: #dc2626;
+      margin: 0;
+      padding: 7px 10px;
     }
 
     .total {
@@ -120,6 +122,29 @@
       padding-top: 12px !important;
     }
 
+    .history {
+      margin-top: 40px;
+    }
+
+    .invoice-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .invoice-card button {
+      margin: 0;
+    }
+
+    .empty {
+      color: #777;
+      margin-top: 10px;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -136,6 +161,10 @@
       table {
         font-size: 12px;
       }
+
+      .invoice-card {
+        display: block;
+      }
     }
 
     @media print {
@@ -149,7 +178,8 @@
         max-width: none;
       }
 
-      button {
+      button,
+      .history {
         display: none;
       }
 
@@ -167,26 +197,62 @@
 
   <h1>EasyInvoice</h1>
 
+  <!-- BUSINESS -->
+
   <h2>Your Business</h2>
 
   <div class="grid">
-    <input id="businessName" placeholder="Business name">
-    <input id="businessEmail" placeholder="Business email">
-    <input id="businessPhone" placeholder="Phone number">
-    <input id="invoiceNumber" placeholder="Invoice number">
+
+    <input
+      id="businessName"
+      placeholder="Business name"
+    >
+
+    <input
+      id="businessEmail"
+      placeholder="Business email"
+    >
+
+    <input
+      id="businessPhone"
+      placeholder="Phone number"
+    >
+
+    <input
+      id="invoiceNumber"
+      placeholder="Invoice number"
+    >
+
   </div>
+
+
+  <!-- CUSTOMER -->
 
   <h2>Customer</h2>
 
   <div class="grid">
-    <input id="customerName" placeholder="Customer name">
-    <input id="customerEmail" placeholder="Customer email">
+
+    <input
+      id="customerName"
+      placeholder="Customer name"
+    >
+
+    <input
+      id="customerEmail"
+      placeholder="Customer email"
+    >
+
   </div>
+
+
+  <!-- ITEMS -->
 
   <h2>Items</h2>
 
   <table>
+
     <thead>
+
       <tr>
         <th>Description</th>
         <th>Quantity</th>
@@ -194,21 +260,35 @@
         <th>Total</th>
         <th></th>
       </tr>
+
     </thead>
 
     <tbody id="items"></tbody>
+
   </table>
 
-  <button class="add-btn" onclick="addItem()">+ Add Item</button>
+
+  <button
+    class="add-btn"
+    onclick="addItem()"
+  >
+    + Add Item
+  </button>
+
+
+  <!-- TOTAL -->
 
   <div class="total">
+
     <div>
       <span>Subtotal</span>
       <span id="subtotal">0.00</span>
     </div>
 
     <div>
+
       <span>Tax (%)</span>
+
       <input
         id="tax"
         type="number"
@@ -217,6 +297,7 @@
         oninput="calculateTotal()"
         style="width:80px;"
       >
+
     </div>
 
     <div>
@@ -228,33 +309,66 @@
       <span>Total</span>
       <span id="grandTotal">0.00</span>
     </div>
+
   </div>
 
-  <button class="print-btn" onclick="window.print()">
+
+  <!-- ACTIONS -->
+
+  <button
+    class="save-btn"
+    onclick="saveInvoice()"
+  >
+    Save Invoice
+  </button>
+
+  <button
+    class="print-btn"
+    onclick="window.print()"
+  >
     Print / Save PDF
   </button>
 
+
+  <!-- HISTORY -->
+
+  <div class="history">
+
+    <h2>Invoice History</h2>
+
+    <div id="historyList"></div>
+
+  </div>
+
 </div>
+
 
 <script>
 
+  // ==============================
+  // ADD ITEM
+  // ==============================
+
   function addItem() {
 
-    const table = document.getElementById("items");
+    const table =
+      document.getElementById("items");
 
-    const row = document.createElement("tr");
+    const row =
+      document.createElement("tr");
 
     row.innerHTML = `
+
       <td>
         <input
-          class="item-input description"
+          class="description"
           placeholder="Service or product"
         >
       </td>
 
       <td>
         <input
-          class="item-input quantity"
+          class="quantity"
           type="number"
           value="1"
           min="1"
@@ -264,7 +378,7 @@
 
       <td>
         <input
-          class="item-input price"
+          class="price"
           type="number"
           value="0"
           min="0"
@@ -277,12 +391,14 @@
       </td>
 
       <td>
+
         <button
           class="delete-btn"
           onclick="deleteItem(this)"
         >
           X
         </button>
+
       </td>
     `;
 
@@ -292,58 +408,216 @@
   }
 
 
+  // ==============================
+  // DELETE ITEM
+  // ==============================
+
   function deleteItem(button) {
 
-    button.closest("tr").remove();
+    button
+      .closest("tr")
+      .remove();
 
     calculateTotal();
   }
 
 
+  // ==============================
+  // CALCULATE TOTAL
+  // ==============================
+
   function calculateTotal() {
 
-    const rows = document.querySelectorAll("#items tr");
+    const rows =
+      document.querySelectorAll("#items tr");
 
     let subtotal = 0;
 
     rows.forEach(row => {
 
       const quantity =
-        parseFloat(row.querySelector(".quantity").value) || 0;
+        parseFloat(
+          row.querySelector(".quantity").value
+        ) || 0;
 
       const price =
-        parseFloat(row.querySelector(".price").value) || 0;
+        parseFloat(
+          row.querySelector(".price").value
+        ) || 0;
 
-      const total = quantity * price;
+      const total =
+        quantity * price;
 
-      row.querySelector(".item-total").textContent =
-        total.toFixed(2);
+      row.querySelector(".item-total")
+        .textContent = total.toFixed(2);
 
       subtotal += total;
+
     });
 
+
     const taxRate =
-      parseFloat(document.getElementById("tax").value) || 0;
+      parseFloat(
+        document.getElementById("tax").value
+      ) || 0;
+
 
     const taxAmount =
       subtotal * taxRate / 100;
 
+
     const grandTotal =
       subtotal + taxAmount;
 
-    document.getElementById("subtotal").textContent =
-      subtotal.toFixed(2);
 
-    document.getElementById("taxAmount").textContent =
-      taxAmount.toFixed(2);
+    document.getElementById("subtotal")
+      .textContent = subtotal.toFixed(2);
 
-    document.getElementById("grandTotal").textContent =
-      grandTotal.toFixed(2);
+    document.getElementById("taxAmount")
+      .textContent = taxAmount.toFixed(2);
+
+    document.getElementById("grandTotal")
+      .textContent = grandTotal.toFixed(2);
+
   }
 
 
-  // Start with one item
+  // ==============================
+  // SAVE INVOICE
+  // ==============================
+
+  function saveInvoice() {
+
+    const invoice = {
+
+      number:
+        document.getElementById("invoiceNumber").value,
+
+      business:
+        document.getElementById("businessName").value,
+
+      customer:
+        document.getElementById("customerName").value,
+
+      total:
+        document.getElementById("grandTotal").textContent,
+
+      date:
+        new Date().toLocaleDateString()
+
+    };
+
+
+    if (!invoice.number) {
+
+      alert("Please enter an invoice number.");
+
+      return;
+    }
+
+
+    let invoices =
+      JSON.parse(
+        localStorage.getItem("invoices")
+      ) || [];
+
+
+    invoices.push(invoice);
+
+
+    localStorage.setItem(
+      "invoices",
+      JSON.stringify(invoices)
+    );
+
+
+    displayHistory();
+
+    alert("Invoice saved!");
+
+  }
+
+
+  // ==============================
+  // DISPLAY HISTORY
+  // ==============================
+
+  function displayHistory() {
+
+    const list =
+      document.getElementById("historyList");
+
+    const invoices =
+      JSON.parse(
+        localStorage.getItem("invoices")
+      ) || [];
+
+
+    list.innerHTML = "";
+
+
+    if (invoices.length === 0) {
+
+      list.innerHTML =
+        `<p class="empty">
+          No invoices saved yet.
+        </p>`;
+
+      return;
+    }
+
+
+    invoices
+      .slice()
+      .reverse()
+      .forEach((invoice, index) => {
+
+        const card =
+          document.createElement("div");
+
+        card.className =
+          "invoice-card";
+
+
+        card.innerHTML = `
+
+          <div>
+
+            <strong>
+              Invoice #${invoice.number}
+            </strong>
+
+            <p>
+              Customer: ${invoice.customer || "N/A"}
+            </p>
+
+            <p>
+              Date: ${invoice.date}
+            </p>
+
+            <p>
+              Total: ${invoice.total}
+            </p>
+
+          </div>
+
+        `;
+
+
+        list.appendChild(card);
+
+      });
+
+  }
+
+
+  // ==============================
+  // START
+  // ==============================
+
   addItem();
+
+  displayHistory();
 
 </script>
 
